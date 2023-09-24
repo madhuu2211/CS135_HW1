@@ -37,5 +37,24 @@ def calc_root_mean_squared_error(y_N, yhat_N):
     yhat_N = np.atleast_1d(yhat_N)
     assert y_N.ndim == 1
     assert y_N.shape == yhat_N.shape
-    return 0.0  # TODO fixme
 
+    N=y_N.shape[0]
+    # Calculate MSE 
+    mse=np.sum((y_N-yhat_N)**2)/N
+    # Calculate RMSE
+    rmse=np.sqrt(mse)
+    return rmse
+
+
+y_N = 0.0
+yhat_N = 4.123
+calc_root_mean_squared_error(y_N, yhat_N)
+
+print()
+
+y_N = np.asarray([-2, 0, 2], dtype=np.float64)
+yhat_N = np.asarray([-4, 0, 2], dtype=np.float64)
+rmse = calc_root_mean_squared_error(y_N, yhat_N)
+np.round(rmse, 6)
+
+print()
