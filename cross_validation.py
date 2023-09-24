@@ -55,14 +55,31 @@ def train_models_and_calc_scores_for_n_fold_cv(
     >>> np.array2string(te_K, precision=8, suppress_small=True)
     '[0. 0. 0. 0. 0. 0. 0.]'
     '''
-    train_error_per_fold = np.zeros(n_folds, dtype=np.float32)
-    test_error_per_fold = np.zeros(n_folds, dtype=np.float32)
+    train_error_per_fold = np.zeros(2, dtype=np.int32)
+    test_error_per_fold = np.zeros(2, dtype=np.int32)
 
     # TODO define the folds here by calling your function
     # e.g. ... = make_train_and_test_row_ids_for_n_fold_cv(...)
+    fold_ids = make_train_and_test_row_ids_for_n_fold_cv(
+        x_NF.shape[0], n_folds, random_state=random_state)
 
     # TODO loop over folds and compute the train and test error
     # for the provided estimator
+    for fold in range(n_folds):
+        train_ids, test_ids = fold_ids[fold]
+
+        x_train = x_NF[train_ids]
+        y_train = y_N[train_ids]
+        x_test = x_NF[test_ids]
+        y_test = y_N[test_ids]
+
+        estimator.fit(x_train, y_train)
+
+        y_train_pred = estimator.predict(x_train)
+        y_test_pred = estimator.predict(x_test)
+
+        train_error_per_fold[fold] = np.mean((y_train_pred - y_train) ** 2)
+        test_error_per_fold[fold] = np.mean((y_test_pred - y_test) ** 2)
 
     return train_error_per_fold, test_error_per_fold
 
@@ -136,11 +153,23 @@ def make_train_and_test_row_ids_for_n_fold_cv(
         random_state = np.random.RandomState(int(random_state))
 
     # TODO obtain a shuffled order of the n_examples
+    shuffled_ids = random_state.permutation(n_examples)
 
     train_ids_per_fold = list()
     test_ids_per_fold = list()
-    
+
+    fold_size = n_examples // n_folds
+
     # TODO establish the row ids that belong to each fold's
     # train subset and test subset
+    for fold in range(n_folds):
+        start = fold * fold_size
+        end = (fold + 1) * fold_size
+
+        test_ids = shuffled_ids[start:end]
+        train_ids = np.concatenate([shuffled_ids[:start], shuffled_ids[end:]])
+
+        train_ids_per_fold.append(train_ids)
+        test_ids_per_fold.append(test_ids)
 
     return train_ids_per_fold, test_ids_per_fold
