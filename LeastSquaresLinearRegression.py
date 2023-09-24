@@ -75,10 +75,21 @@ class LeastSquaresLinearRegressor(object):
                 \sum_{n=1}^N (y_n - b - \sum_f x_{nf} w_f)^2
         '''      
         N, F = x_NF.shape
+        # Add a column of ones for this bias term
+        X=np.hstack([np.ones((N,1)),x_NF])
+
+        # Reshape y to a column vector
+        Y=y_N.reshape(-1,1)
+
+        #Solve the normal equation
+        W=np.linalg.solve(X.T@X, X.T@Y)
+
         
+        self.w_F=W[1:,0]
+
+        self.b=W[0]
         # Hint: Use np.linalg.solve
         # Using np.linalg.inv may cause issues (see day03 lab) 
-        pass # TODO fixme
 
 
     def predict(self, x_MF):
@@ -96,7 +107,7 @@ class LeastSquaresLinearRegressor(object):
             Each value is the predicted scalar for one example
         '''
         # TODO FIX ME
-        return np.asarray([0.0])
+        return x_MF @ self.w_F + self.b
 
 
 
