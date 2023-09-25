@@ -1,6 +1,7 @@
 import numpy as np
 
 from performance_metrics import calc_root_mean_squared_error
+from sklearn.model_selection import cross_validate
 
 
 def train_models_and_calc_scores_for_n_fold_cv(
